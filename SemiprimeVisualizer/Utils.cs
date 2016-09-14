@@ -114,16 +114,22 @@ namespace SemiprimeVisualizer
 
 		#region Open/Save State
 
-		public static string FileDialog<TFileDialog>() where TFileDialog : FileDialog, new()
+		public static string FileDialog<TFileDialog>(string filter) where TFileDialog : FileDialog, new()
 		{
 			string result = string.Empty;
-			using (FileDialog openFile = new TFileDialog())
+			using (FileDialog fileDlg = new TFileDialog())
 			{
-				openFile.DefaultExt = ".xml";
-				openFile.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
-				if (openFile.ShowDialog() == DialogResult.OK)
+				string filesFilter = filter ?? "";
+				if (!string.IsNullOrWhiteSpace(filesFilter))
 				{
-					result = openFile.FileName;
+					filesFilter += " | ";
+				}
+				filesFilter += "All Files(*.*) | *.*";
+				fileDlg.Filter = filesFilter;
+				fileDlg.InitialDirectory = Path.GetDirectoryName(Application.ExecutablePath);
+				if (fileDlg.ShowDialog() == DialogResult.OK)
+				{
+					result = fileDlg.FileName;
 				}
 			}
 			return result;

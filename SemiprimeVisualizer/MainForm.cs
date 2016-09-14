@@ -188,6 +188,48 @@ namespace SemiprimeVisualizer
 		#endregion
 		#region Numeric Up/Down Step Feature
 
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		{
+			if (keyData.HasFlag(Keys.Control) && keyData.HasFlag(Keys.P))
+			{
+				if (chart1 != null && chart1.ChartAreas.Count > 0)
+				{
+					string filename = Utils.FileDialog<SaveFileDialog>("PNG Files(*.png) | *.png | JPG Files(*.jpg) | *.jpg | BMP Files(*.bmp) | *.bmp | GIF Files(*.gif) | *.gif | TIFF Files(*.tiff) | *.tiff");
+					if (!string.IsNullOrWhiteSpace(filename))
+					{
+						string ext = Path.GetExtension(filename);
+						ChartImageFormat format = ChartImageFormat.Bmp;
+
+						if (ext == ".png")
+						{
+							format = ChartImageFormat.Png;
+						}
+						else if (ext == ".jpg")
+						{
+							format = ChartImageFormat.Jpeg;
+						}
+						else if(ext == ".bmp")
+						{
+							format = ChartImageFormat.Bmp;
+						}
+						else if (ext == ".gif")
+						{
+							format = ChartImageFormat.Gif;
+						}
+						else if (ext == ".tiff")
+						{
+							format = ChartImageFormat.Tiff;
+						}
+
+						chart1.SaveImage(filename, format);
+					}				
+				}
+				return true;
+			}
+
+			return base.ProcessCmdKey(ref msg, keyData);
+		}
+
 		private void numericUpDownP_ValueChanged(object sender, EventArgs e)
 		{
 			BigInteger temp = p.CurrentValue;
@@ -304,7 +346,7 @@ namespace SemiprimeVisualizer
 			BigInteger gnVal = goalNeg.CurrentValue;
 			BigInteger pnVal = productNeg.CurrentValue;
 
-			UInt32 MaximumValue = 20000;
+			UInt32 MaximumValue = 2147483648;//4000000000;
 
 			if (gpVal > MaximumValue)
 			{
@@ -399,7 +441,7 @@ namespace SemiprimeVisualizer
 
 		private void btnSave_Click(object sender, EventArgs e)
 		{
-			string filename = Utils.FileDialog<SaveFileDialog>();
+			string filename = Utils.FileDialog<SaveFileDialog>("XML Files(*.xml) | *.xml");
 			if (string.IsNullOrWhiteSpace(filename))
 			{
 				return;
@@ -420,7 +462,7 @@ namespace SemiprimeVisualizer
 
 		private void btnOpen_Click(object sender, EventArgs e)
 		{
-			string filename = Utils.FileDialog<SaveFileDialog>();
+			string filename = Utils.FileDialog<OpenFileDialog>("XML Files(*.xml) | *.xml");
 			if (string.IsNullOrWhiteSpace(filename))
 			{
 				return;
@@ -452,6 +494,11 @@ namespace SemiprimeVisualizer
 			p.CurrentValue = oP;
 			q.CurrentValue = oQ;
 			product.CurrentValue = oProd;
+
+			tbSemiPrime.Text = SemiPrime.ToString();
+			tbSemiPrime0.Text = SemiPrime.ToString();
+			rtbSemiPrime.Text = SemiPrime.ToString();
+			tbSquareRoot.Text = Sqrt.ToString();
 
 			UpdateControls();
 		}
