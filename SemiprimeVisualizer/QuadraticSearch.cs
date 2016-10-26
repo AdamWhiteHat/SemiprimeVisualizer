@@ -1,131 +1,170 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Numerics;
+using System.Text;
 
 namespace SemiprimeVisualizer
 {
 	public class QuadraticSearch
 	{
-		public BigInteger ToFactor { get; private set; }
-		public BigInteger SquareRoot { get; private set; }
+		public BigInteger SemiPrime;
+		private Action<string> LoggingMethod;
+		private QuadraticSieve quadraticSieve;
 
-		public IEnumerable<BigInteger> NumberRange;
-		public IEnumerable<BigInteger> DifferenceOfSquaresCollection;
-		public IEnumerable<BigInteger> LargestPrimeFactorsCollection;
-		public IEnumerable<BigInteger> FermatSquaresCollection;
-		public IEnumerable<BigInteger> SmoothNumbersCollection;
+		private List<BigInteger> DifferenceOfSquares = new List<BigInteger>();
+		private List<BigInteger> LargestPrimeFactors = new List<BigInteger>();
+		private List<BigInteger> FermatSquares = new List<BigInteger>();
+		private List<BigInteger> SmoothNumbers = new List<BigInteger>();
+		private IEnumerable<BigInteger> differenceOfSquaresEnumerator;  //private IEnumerable<BigInteger> largestPrimeFactorEnumerator;
+		private IEnumerable<BigInteger> fermatSquaresEnumerator;
+		private IEnumerable<BigInteger> smoothNumbersEnumerator;
 
-		public QuadraticSearch(BigInteger numberToFactor)
+		public QuadraticSearch(BigInteger semiPrime, Action<string> loggingMethod)
 		{
-			ToFactor = numberToFactor;
-			SquareRoot = ToFactor.Sqrt();
+			quadraticSieve = null;
+			SemiPrime = semiPrime;
+			LoggingMethod = loggingMethod;
 		}
 
-		private IEnumerableRange CreateIEnumerableRange()
+		public void StartSearch()
 		{
-			return new IEnumerableRange(SquareRoot, (ToFactor / 2) - 1, 1);
-		}
-
-		public IEnumerable<BigInteger> GetDifferenceOfSquares()
-		{
-			IEnumerableRange range = CreateIEnumerableRange();
-			foreach (BigInteger num in range.GetEnumerableRange())
+			if (quadraticSieve == null)
 			{
-				BigInteger temp = (BigInteger.Pow(num, 2) - ToFactor);
-				yield return temp;
+				quadraticSieve = new QuadraticSieve(SemiPrime);
+				differenceOfSquaresEnumerator = quadraticSieve.GetDifferenceOfSquares();
 			}
-			yield break;
-		}
 
-		public IEnumerable<BigInteger> SelectLargestFactor()
-		{
-			BigInteger num;
-			IEnumerableRange range = CreateIEnumerableRange();
-			foreach (BigInteger number in range.GetEnumerableRange())
+			if (differenceOfSquaresEnumerator != null)
 			{
-				num = new BigInteger(number.ToByteArray());
-				if (num == 2)
+				int skipCnt = 0;
+				if (DifferenceOfSquares.Count > 0)
 				{
-					yield return 2;
+					skipCnt = DifferenceOfSquares.Count;
 				}
-				while (num % 2 == 0)
-				{
-					num = num / 2;
-				}
-				for (BigInteger i = 3; i * i <= num; i += 2)
-				{
-					while (num % i == 0)
-					{
-						num = num / i;
-					}
-				}
-				yield return num;
+				List<BigInteger> newDifferenceOfSquares = differenceOfSquaresEnumerator.Skip(skipCnt).Take(1).ToList();
+				DifferenceOfSquares.AddRange(newDifferenceOfSquares);
+
+				string relations = string.Join(Environment.NewLine, newDifferenceOfSquares) + Environment.NewLine;
+				LoggingMethod.Invoke(relations);
+
+				BigInteger a = newDifferenceOfSquares.First();
+				BigInteger a2 = a.Square();
+
+				BigInteger b2 = a2 - SemiPrime;
+				BigInteger b = b2.Sqrt();
+
+				BigInteger congruence = (b % SemiPrime);
+				bool hasCongruence = (congruence == a);
+				bool keep = !hasCongruence;
+
+				LoggingMethod.Invoke(congruence.ToString() + ": " + keep.ToString() + Environment.NewLine);
+
+
+				//WriteOutput("Difference of Squares");
+				//WriteOutput(result + Environment.NewLine);
+
+				//LargestPrimeFactors.AddRange(quadraticSearch.SelectLargestFactor());
+
+				//int index = 0;
+				//Dictionary<BigInteger, List<int>> primeFactorIndexDictionary = new Dictionary<BigInteger, List<int>>();
+				//foreach (BigInteger factor in LargestPrimeFactors)
+				//{
+				//	if (primeFactorIndexDictionary.ContainsKey(factor))
+				//	{
+				//		primeFactorIndexDictionary[factor].Add(index++);
+				//	}
+				//	else
+				//	{
+				//		List<int> newList = new List<int>();
+				//		newList.Add(index++);
+				//		primeFactorIndexDictionary.Add(factor, newList);
+				//	}
+				//}
+
+				//IOrderedEnumerable<KeyValuePair<BigInteger, List<int>>> orderedPrimeFactors = primeFactorIndexDictionary.OrderBy(kvp => kvp.Key);
+
+				//result = string.Join(Environment.NewLine, orderedPrimeFactors.Select(kvp => string.Format("{0} :\t[{1}]", kvp.Key, string.Join(", ", kvp.Value))));
+
+				////WriteOutput("Largest Prime Factors");
+				////WriteOutput(result + Environment.NewLine);
+
+				//List<KeyValuePair<BigInteger, List<int>>> smoothNumbers = orderedPrimeFactors.Where(kvp => kvp.Value.Count > 2).ToList();
+
+				//List<KeyValuePair<BigInteger, List<BigInteger>>> FoundFactors = new List<KeyValuePair<BigInteger, List<BigInteger>>>();
+
+				//foreach (KeyValuePair<BigInteger, List<int>> smoothFactors in smoothNumbers)
+				//{
+				//	if (smoothFactors.Key == 1)
+				//	{
+				//		continue;
+				//	}
+
+				//	List<BigInteger> factors = new List<BigInteger>();
+				//	foreach (int indx in smoothFactors.Value)
+				//	{
+				//		factors.Add(DifferenceOfSquares[indx]);
+				//	}
+				//	//WriteOutput(string.Format("Common Prime Factor: {0} of [{1}]", smoothFactors.Key, string.Join(", ", factors)));
+
+				//	BigInteger sum = factors.Aggregate(BigInteger.Multiply);
+
+				//	if (QuadraticSearch.IsSquare(sum))
+				//	{
+				//		//WriteOutput(string.Format("*FoundSquare: {0}\r\n*Factors: {1}", smoothFactors.Key, string.Join(", ", factors)));
+				//		FoundFactors.Add(new KeyValuePair<BigInteger, List<BigInteger>>(smoothFactors.Key, factors));
+				//	}
+				//}
+
+				//if (DifferenceOfSquares.Count > 10000)
+				//{
+				//	if (FermatSquares.Count < 100)
+				//	{
+				//		if (fermatSquaresEnumerator == null)
+				//		{
+				//			fermatSquaresEnumerator = quadraticSearch.WhereFermatSquareFilter();
+				//		}
+
+				//		if (fermatSquaresEnumerator != null)
+				//		{
+				//			int skipB = 0;
+				//			if (FermatSquares.Count > 0)
+				//			{
+				//				skipB = FermatSquares.Count;
+				//			}
+				//			List<BigInteger> newSquares = fermatSquaresEnumerator.Skip(skipB).Take(1).ToList();
+				//			FermatSquares.AddRange(newSquares);
+				//			result = string.Join(Environment.NewLine, newSquares);
+
+				//			//WriteOutput("(a^2)-n squares");
+				//			//WriteOutput(result + Environment.NewLine);
+				//		}
+				//	}
+				//	else
+				//	{
+				//		if (smoothNumbersEnumerator == null)
+				//		{
+				//			smoothNumbersEnumerator = quadraticSearch.WhereSmoothNumberFilter(quadraticSearch.ToFactor, FermatSquares);
+				//		}
+
+				//		if (smoothNumbersEnumerator != null)
+				//		{
+				//			int skipC = 0;
+				//			if (SmoothNumbers.Count > 0)
+				//			{
+				//				skipC = SmoothNumbers.Count;
+				//			}
+				//			List<BigInteger> newSmoothNumbers = smoothNumbersEnumerator.Skip(skipC).Take(10).ToList();
+				//			SmoothNumbers.AddRange(newSmoothNumbers);
+				//			result = string.Join(Environment.NewLine, newSmoothNumbers);
+
+				//			//WriteOutput("Smooth Numbers");
+				//			//WriteOutput(result + Environment.NewLine);
+				//		}
+				//	}
+				//}
 			}
-			yield break;
 		}
 
-		public IEnumerable<BigInteger> WhereFermatSquareFilter()
-		{
-			IEnumerableRange range = CreateIEnumerableRange();
-			return range.GetEnumerableRange().Where(bi => IsSquare(bi));
-		}
-
-		public IEnumerable<BigInteger> WhereSmoothNumberFilter(BigInteger toFactor, IEnumerable<BigInteger> input)
-		{
-			IEnumerableRange range = CreateIEnumerableRange();
-			return range.GetEnumerableRange().Where(bi => !IsCoprime(toFactor, bi));
-		}
-		
-		public static bool IsSquare(BigInteger input)
-		{
-			return (BigInteger.Pow(input.Sqrt(), 2) == input);
-		}
-
-		public static BigInteger MakeSquare(BigInteger input)
-		{
-			return input * input;
-		}
-
-		public static bool IsCoprime(BigInteger value1, BigInteger value2)
-		{
-			return FindGCD(value1, value2) == 1;
-		}
-
-		public static BigInteger FindGCD(BigInteger to, params BigInteger[] args)
-		{
-			if (args == null) { throw new ArgumentNullException("args can not be null"); }
-			if (args.Length < 2) { throw new ArgumentException("Must supply 2 or more arguments"); }
-			return FindGCD(to, args.Aggregate(FindGCD));
-		}
-
-		public static BigInteger FindLCM(params BigInteger[] args)
-		{
-			if (args == null) { throw new ArgumentNullException("args can not be null"); }
-			if (args.Length < 2) { throw new ArgumentException("Must supply 2 or more arguments"); }
-			return args.Aggregate(FindLCM);
-		}
-
-		public static BigInteger FindGCD(BigInteger value1, BigInteger value2)
-		{
-			while (value1 != 0 && value2 != 0)
-			{
-				if (value1 > value2)
-				{
-					value1 %= value2;
-				}
-				else
-				{
-					value2 %= value1;
-				}
-			}
-			return BigInteger.Max(value1, value2);
-		}
-
-		public static BigInteger FindLCM(BigInteger num1, BigInteger num2)
-		{
-			return (num1 * num2) / FindGCD(num1, num2);
-		}
 	}
 }
