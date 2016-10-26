@@ -17,7 +17,7 @@ namespace SemiprimeVisualizer
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
+			//AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
 
 			Application.Run(new MainForm());
 		}
