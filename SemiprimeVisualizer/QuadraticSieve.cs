@@ -20,16 +20,16 @@ namespace SemiprimeVisualizer
 		public IEnumerable<BigInteger> FermatSquaresCollection;
 		public IEnumerable<BigInteger> SmoothNumbersCollection;
 
-		private IEnumerableRange enumerableRangeA;
-		private IEnumerableRange enumerableRangeB;
+		private EnumerableRange enumerableRangeA;
+		private EnumerableRange enumerableRangeB;
 
 
 		public QuadraticSieve(BigInteger numberToFactor)
 		{
 			ToFactor = numberToFactor;
 			SquareRoot = ToFactor.Sqrt();
-			enumerableRangeA = new IEnumerableRange(SquareRoot, (ToFactor / 2) - 1, 1);
-			enumerableRangeB = new IEnumerableRange(SquareRoot, SquareRoot + 1000, 1);
+			enumerableRangeA = new EnumerableRange(SquareRoot, (ToFactor / 2) - 1, 1);
+			enumerableRangeB = new EnumerableRange(SquareRoot, SquareRoot + 1000, 1);
 			NumberRangeA = enumerableRangeA.GetEnumerableRange();
 			NumberRangeB = enumerableRangeB.GetEnumerableRange();
 		}
@@ -58,7 +58,7 @@ namespace SemiprimeVisualizer
 						yield return temp;
 					}
 				}
-				enumerableRangeB = new IEnumerableRange(SquareRoot + counter, SquareRoot + 1000 + counter++, 1);
+				enumerableRangeB = new EnumerableRange(SquareRoot + counter, SquareRoot + 1000 + counter++, 1);
 				NumberRangeB = enumerableRangeB.GetEnumerableRange();
 			}
 

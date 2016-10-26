@@ -89,7 +89,7 @@
     <Compile Include="SmoothNumbers.cs" />
     <Compile Include="BigDecimal.cs" />
     <Compile Include="BigIntegerExtensionMethods.cs" />
-    <Compile Include="IEnumerableRange.cs" />
+    <Compile Include="EnumerableRange.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace SemiprimeVisualizer
 {
-	public class IEnumerableRange
+	public class EnumerableRange
 	{
 		public BigInteger RangeMin { get; private set; }
 		public BigInteger RangeMax { get; private set; }
@@ -15,7 +15,7 @@ namespace SemiprimeVisualizer
 
 		private IEnumerable<BigInteger> enumerableRange;
 
-		public IEnumerableRange(BigInteger start, BigInteger stop, BigInteger increment)
+		public EnumerableRange(BigInteger start, BigInteger stop, BigInteger increment)
 		{
 			RangeMin = start;
 			RangeMax = stop;
