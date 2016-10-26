@@ -8,10 +8,12 @@ namespace SemiprimeVisualizer
 {
 	public class IEnumerableRange
 	{
-		private BigInteger RangeMin;
-		private BigInteger RangeMax;
-		private BigInteger CurrentValue;
-		private BigInteger IncrementValue;
+		public BigInteger RangeMin { get; private set; }
+		public BigInteger RangeMax { get; private set; }
+		public BigInteger CurrentValue { get; private set; }
+		public BigInteger IncrementValue { get; private set; }
+
+		private IEnumerable<BigInteger> enumerableRange;
 
 		public IEnumerableRange(BigInteger start, BigInteger stop, BigInteger increment)
 		{
@@ -19,16 +21,26 @@ namespace SemiprimeVisualizer
 			RangeMax = stop;
 			CurrentValue = RangeMin;
 			IncrementValue = increment;
+			Reset();
+			enumerableRange = BuildEnumerableRange();
 		}
 
 		public IEnumerable<BigInteger> GetEnumerableRange()
 		{
-			CurrentValue = RangeMin;
+			return enumerableRange;
+		}
 
+		public void Reset()
+		{
+			CurrentValue = RangeMin;
+		}
+
+		private IEnumerable<BigInteger> BuildEnumerableRange()
+		{
 			while (CurrentValue < RangeMax)
 			{
 				yield return CurrentValue;
-				CurrentValue = CurrentValue + IncrementValue;
+				CurrentValue += IncrementValue;
 			}
 			yield break;
 		}
