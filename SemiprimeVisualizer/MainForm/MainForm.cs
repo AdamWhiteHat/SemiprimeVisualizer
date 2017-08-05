@@ -10,7 +10,6 @@ using System.Collections.Generic;
 
 namespace SemiprimeVisualizer
 {
-	using AJRLibray.Math;
 	using System.Numerics;
 	using System.Windows.Forms;
 	using System.Windows.Forms.DataVisualization;
