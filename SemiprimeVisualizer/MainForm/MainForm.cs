@@ -3,17 +3,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Xml.Linq;
-
+using System.Numerics;
+using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Windows.Forms.DataVisualization;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace SemiprimeVisualizer
 {
-	using System.Numerics;
-	using System.Windows.Forms;
-	using System.Windows.Forms.DataVisualization;
-	using System.Windows.Forms.DataVisualization.Charting;
+
 
 	public partial class MainForm : Form
 	{
@@ -45,7 +44,7 @@ namespace SemiprimeVisualizer
 		private bool IsAutomatedRunning = false;
 
 		// Static Readonly
-		private static readonly string sampleSemiPrime = "9223372021822390277";//"456072034621752164554771693484021599673";//"243623899407479601851";
+		private static readonly string sampleSemiPrime = "456072034621752164554771693484021599673";//"243623899407479601851";
 		private static readonly string ButtonTextStop = "Stop";
 		private static readonly string ButtonTextSearch = "Automate search...";
 
@@ -99,8 +98,6 @@ namespace SemiprimeVisualizer
 
 			Reset();
 
-			InitializeChartSeries();
-
 			rtbP.KeyDown += new KeyEventHandler(tbP_KeyDown);
 			rtbP.KeyDown += new KeyEventHandler(tbPQ_KeyDown);
 			rtbQ.KeyDown += new KeyEventHandler(tbPQ_KeyDown);
@@ -108,6 +105,11 @@ namespace SemiprimeVisualizer
 			rtbQ.TextChanged += new EventHandler(tbPQ_TextChanged);
 			numericUpDownP.ValueChanged += new EventHandler(numericUpDownP_ValueChanged);
 			numericUpDownQ.ValueChanged += new EventHandler(numericUpDownQ_ValueChanged);
+		}
+
+		private void MainForm_Shown(object sender, EventArgs e)
+		{
+			InitializeChartSeries();
 		}
 
 		private void InitializeChartSeries()
@@ -129,11 +131,11 @@ namespace SemiprimeVisualizer
 			seriesP.EmptyPointStyle.LabelBorderWidth = 0;
 			seriesP.EmptyPointStyle.MarkerBorderWidth = 0;
 			seriesP.EmptyPointStyle.LabelForeColor = Color.White;
-			seriesP.IsVisibleInLegend = false;
+			//seriesP.IsVisibleInLegend = false;
 			seriesP.LabelForeColor = Color.Empty;
 			seriesP.SmartLabelStyle.CalloutLineColor = Color.DarkGray;
-			seriesP.XValueType = ChartValueType.UInt32;
-			seriesP.YValueType = ChartValueType.UInt32;
+			seriesP.IsXValueIndexed = false;
+			seriesP.Enabled = true;
 
 			seriesN.Name = "SeriesNegative";
 			seriesN.ChartArea = "ChartArea1";
@@ -147,11 +149,11 @@ namespace SemiprimeVisualizer
 			seriesN.EmptyPointStyle.BorderWidth = 0;
 			seriesN.EmptyPointStyle.LabelBorderWidth = 0;
 			seriesN.EmptyPointStyle.MarkerBorderWidth = 0;
-			seriesN.IsVisibleInLegend = false;
+			//seriesN.IsVisibleInLegend = false;
 			seriesN.LabelForeColor = Color.Empty;
 			seriesN.SmartLabelStyle.CalloutLineColor = Color.DarkGray;
-			seriesN.XValueType = ChartValueType.UInt32;
-			seriesN.YValueType = ChartValueType.UInt32;
+			seriesN.IsXValueIndexed = false;
+			seriesN.Enabled = true;
 
 			seriesR.Name = "SeriesRemainder";
 			seriesR.ChartArea = "ChartArea1";
@@ -165,26 +167,35 @@ namespace SemiprimeVisualizer
 			seriesR.EmptyPointStyle.BorderWidth = 0;
 			seriesR.EmptyPointStyle.LabelBorderWidth = 0;
 			seriesR.EmptyPointStyle.MarkerBorderWidth = 0;
-			seriesR.IsVisibleInLegend = false;
+			//seriesR.IsVisibleInLegend = false;
 			seriesR.LabelForeColor = Color.Empty;
 			seriesR.SmartLabelStyle.CalloutLineColor = Color.DarkGray;
-			seriesR.XValueType = ChartValueType.UInt32;
-			seriesR.YValueType = ChartValueType.UInt32;
+			seriesR.IsXValueIndexed = false;
+			seriesR.Enabled = true;
 
 			this.chart1.Series.Add(seriesP);
 			this.chart1.Series.Add(seriesN);
 			this.chart1.Series.Add(seriesR);
 
-			//this.chart1.Series[0].XValueType = ChartValueType.UInt32;
-			//this.chart1.Series[0].YValueType = ChartValueType.UInt32;
-			//this.chart1.Series[1].XValueType = ChartValueType.UInt32;
-			//this.chart1.Series[1].YValueType = ChartValueType.UInt32;
-			//this.chart1.Series[2].XValueType = ChartValueType.UInt32;
-			//this.chart1.Series[2].YValueType = ChartValueType.UInt32;
+			this.chart1.Series[0].XValueType = ChartValueType.UInt32;
+			this.chart1.Series[0].YValueType = ChartValueType.UInt32;
+			this.chart1.Series[1].XValueType = ChartValueType.UInt32;
+			this.chart1.Series[1].YValueType = ChartValueType.UInt32;
+			this.chart1.Series[2].XValueType = ChartValueType.UInt32;
+			this.chart1.Series[2].YValueType = ChartValueType.UInt32;
 
 			this.chart1.ChartAreas[0].AxisX.Maximum = UInt32.MaxValue - 1;
 			this.chart1.ChartAreas[0].AxisY.Maximum = UInt32.MaxValue - 1;
+			this.chart1.ChartAreas[0].AxisX.Minimum = 0;
+			this.chart1.ChartAreas[0].AxisY.Minimum = 0;
+			this.chart1.ChartAreas[0].Visible = true;
+
+
+			this.chart1.Enabled = true;
+			this.chart1.Update();
 		}
+
+		private static UInt32 ChartAxisMaxValue = UInt32.MaxValue - 1; //## Change Type HERE ##
 
 		private void InitializeNewSemiPrime(string input)
 		{
@@ -262,7 +273,7 @@ namespace SemiprimeVisualizer
 					chart1.Series[0].Points.Clear();
 					chart1.Series[1].Points.Clear();
 					chart1.Series[2].Points.Clear();
-					chart1.ResetAutoValues();
+					//chart1.ResetAutoValues();
 				}
 				timerAutoStep.Start();
 			}
@@ -310,57 +321,7 @@ namespace SemiprimeVisualizer
 			BigDecimal afterQuotient = currentValueProduct / newValueP; // targetValueProduct / newValueP;
 			BigInteger ToAddQs = (BigInteger)(afterQuotient - beforeQuotient) - 1;
 
-			// --------------
-
-
-			//BigInteger diffrenceBetweenTargetAndCurrentProduct = targetValueProduct - currentValueProduct;
-
-
-			//BigInteger totalValueDecrease = currentValueP * toSubtract;
-			//BigInteger newUnadjustedProductDifference = currentValueProduct - totalValueDecrease;
-			//BigInteger differenceFromTargetProduct = targetValueProduct - newUnadjustedProductDifference;
-			//BigInteger NEWnumberOfQsToAdd = differenceFromTargetProduct / currentValueQ;
-
-			//if (ToAddQs != NEWnumberOfQsToAdd)
-			//{
-			//	BigInteger toAdd1 = ToAddQs;
-			//	BigInteger toAdd2 = NEWnumberOfQsToAdd;
-
-			//	BigInteger product1 = newValueP * (currentValueQ + toAdd1);
-			//	BigInteger product2 = newValueP * (currentValueQ + toAdd2);
-
-			//	BigInteger difference1 = targetValueProduct - product1;
-			//	BigInteger difference2 = targetValueProduct - product2;
-
-			//	BigInteger differenceOfDifferences = BigInteger.Max(difference1, difference2) - BigInteger.Min(difference1, difference2);
-
-			//	bool is2Better = false;
-			//	BigInteger winnerToAdd = toAdd1;
-			//	BigInteger winnerDifference = difference1;
-			//	if (BigInteger.Abs(difference2) < BigInteger.Abs(difference1))
-			//	{
-			//		is2Better = true;
-			//		winnerToAdd = toAdd2;
-			//		winnerDifference = difference2;
-			//	}
-
-			//	BigInteger winnerAdjustment = BigInteger.Zero;
-			//	if (winnerDifference > (currentValueQ + winnerToAdd))
-			//	{
-			//		winnerAdjustment = winnerDifference / (currentValueQ + winnerToAdd);
-			//	}
-
-			//	string is3BetterString = is2Better.ToString();
-			//	string adjustmentString = winnerAdjustment.ToString();
-
-			//	int i = 0;
-			//}
-			//BigInteger n = toSubtract;
-			//BigInteger rightSigma = (n * (n + 1)) / 2;
-			//BigInteger toAddPlusSigma = n + rightSigma;
-
-
-
+		
 			BigInteger newValueQ = (currentValueQ + ToAddQs);
 			BigInteger newProduct = (newValueP * newValueQ);
 			BigInteger newProductDifference = targetValueProduct - newProduct;
@@ -373,8 +334,7 @@ namespace SemiprimeVisualizer
 			}
 			else if (BigInteger.Abs(newProductDifference) > newValueP)
 			{
-				int i = 0;
-				//pAdjustment = BigInteger.Abs(newProductDifference) / newValueP;
+				pAdjustment = BigInteger.Abs(newProductDifference) / newValueP;
 			}
 
 			if (newProductDifference.Sign == -1)
@@ -384,6 +344,55 @@ namespace SemiprimeVisualizer
 
 			BigInteger toAdd = ToAddQs + qAdjustment;
 			BigInteger toSub = toSubtract + pAdjustment;
+
+			#region Old Approach ... ?
+
+			//BigInteger diffrenceBetweenTargetAndCurrentProduct = targetValueProduct - currentValueProduct;
+			//BigInteger totalValueDecrease = currentValueP * toSubtract;
+			//BigInteger newUnadjustedProductDifference = currentValueProduct - totalValueDecrease;
+			//BigInteger differenceFromTargetProduct = targetValueProduct - newUnadjustedProductDifference;
+			//BigInteger NEWnumberOfQsToAdd = differenceFromTargetProduct / currentValueQ;
+			//
+			//if (ToAddQs != NEWnumberOfQsToAdd)
+			//{
+			//	BigInteger toAdd1 = ToAddQs;
+			//	BigInteger toAdd2 = NEWnumberOfQsToAdd;
+			//
+			//	BigInteger product1 = newValueP * (currentValueQ + toAdd1);
+			//	BigInteger product2 = newValueP * (currentValueQ + toAdd2);
+			//
+			//	BigInteger difference1 = targetValueProduct - product1;
+			//	BigInteger difference2 = targetValueProduct - product2;
+			//
+			//	BigInteger differenceOfDifferences = BigInteger.Max(difference1, difference2) - BigInteger.Min(difference1, difference2);
+			//
+			//	bool is2Better = false;
+			//	BigInteger winnerToAdd = toAdd1;
+			//	BigInteger winnerDifference = difference1;
+			//	if (BigInteger.Abs(difference2) < BigInteger.Abs(difference1))
+			//	{
+			//		is2Better = true;
+			//		winnerToAdd = toAdd2;
+			//		winnerDifference = difference2;
+			//	}
+			//
+			//	BigInteger winnerAdjustment = BigInteger.Zero;
+			//	if (winnerDifference > (currentValueQ + winnerToAdd))
+			//	{
+			//		winnerAdjustment = winnerDifference / (currentValueQ + winnerToAdd);
+			//	}
+			//
+			//	string is3BetterString = is2Better.ToString();
+			//	string adjustmentString = winnerAdjustment.ToString();
+			//
+			//	int i = 0;
+			//}
+			//BigInteger n = toSubtract;
+			//BigInteger rightSigma = (n * (n + 1)) / 2;
+			//BigInteger toAddPlusSigma = n + rightSigma;
+
+			#endregion
+
 
 			return new Tuple<BigInteger, BigInteger>(toAdd, toSub);
 		}
@@ -556,7 +565,7 @@ namespace SemiprimeVisualizer
 			MessageBox.Show("Product is equal to Semi-Prime!", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 
-		private static UInt32 ChartAxisMaxValue = UInt32.MaxValue - 1; //## Change Type HERE ##
+
 
 		BigInteger lastDeltaGoalNeg = new BigInteger();
 		BigInteger lastDeltaGoalPos = new BigInteger();
@@ -669,12 +678,12 @@ namespace SemiprimeVisualizer
 			{
 				if (skipCounter++ > 10)
 				{
-					chart1.Series[0].XValueType = ChartValueType.UInt32; //## HERE, ##
-					chart1.Series[0].YValueType = ChartValueType.UInt32;
-					chart1.Series[1].XValueType = ChartValueType.UInt32;
-					chart1.Series[1].YValueType = ChartValueType.UInt32;
-					chart1.Series[2].XValueType = ChartValueType.UInt32;
-					chart1.Series[2].YValueType = ChartValueType.UInt32;
+					//chart1.Series[0].XValueType = ChartValueType.UInt32; //## HERE, ##
+					//chart1.Series[0].YValueType = ChartValueType.UInt32;
+					//chart1.Series[1].XValueType = ChartValueType.UInt32;
+					//chart1.Series[1].YValueType = ChartValueType.UInt32;
+					//chart1.Series[2].XValueType = ChartValueType.UInt32;
+					//chart1.Series[2].YValueType = ChartValueType.UInt32;
 					isInitialized = true;
 				}
 				return;
@@ -684,12 +693,12 @@ namespace SemiprimeVisualizer
 			BigInteger ppVal = productPos.CurrentValue;
 			BigInteger gnVal = goalNeg.CurrentValue;
 			BigInteger pnVal = productNeg.CurrentValue;
-						
+
 			BigInteger A = gpVal;
 			BigInteger B = ppVal;
 			BigInteger X = gnVal;
 			BigInteger Y = pnVal;
-			
+
 			if (A > aMax) { aMax = A; }
 			if (B > bMax) { bMax = B; }
 			if (X > xMax) { xMax = X; }
@@ -701,10 +710,10 @@ namespace SemiprimeVisualizer
 			//	{	maxVal = maxVal.Sqrt() * 2; }
 			//}
 
-			//gpVal = BigInteger.Max(0, gpVal - chartTruncateValue);
-			//ppVal = BigInteger.Max(0, ppVal - chartTruncateValue);
-			//gnVal = BigInteger.Max(0, gnVal - chartTruncateValue);
-			//pnVal = BigInteger.Max(0, pnVal - chartTruncateValue);
+			A = BigInteger.Max(0, A);
+			B = BigInteger.Max(0, B);
+			X = BigInteger.Max(0, X);
+			Y = BigInteger.Max(0, Y);
 
 			//if (gpVal > ChartAxisMaxValue
 			// || ppVal > ChartAxisMaxValue
@@ -722,45 +731,46 @@ namespace SemiprimeVisualizer
 			//var x = (UInt32)BigInteger.Log(goalNeg.CurrentValue);
 			//var y = (UInt32)BigInteger.Log(productNeg.CurrentValue);
 
-			//if (double.IsInfinity(a) || double.IsNaN(a)) { a = 0; }
-			//if (double.IsInfinity(b) || double.IsNaN(b)) { b = 0; }
-			//if (double.IsInfinity(x) || double.IsNaN(x)) { x = 0; }
-			//if (double.IsInfinity(y) || double.IsNaN(y)) { y = 0; }
+			//if (double.IsInfinity(A) || double.IsNaN(a)) { a = 0; }
+			//if (double.IsInfinity(B) || double.IsNaN(b)) { b = 0; }
+			//if (double.IsInfinity(X) || double.IsNaN(x)) { x = 0; }
+			//if (double.IsInfinity(Y) || double.IsNaN(y)) { y = 0; }
 
 			if (A > ChartAxisMaxValue)
 			{
-				A = (A / ChartAxisMaxValue) + 1;
+				A = (A % ChartAxisMaxValue) - 1;
 			}
 			if (B > ChartAxisMaxValue)
 			{
-				B = (B / ChartAxisMaxValue) + 1;
+				B = (B % ChartAxisMaxValue) - 1;
 			}
 			if (X > ChartAxisMaxValue)
 			{
-				X = (X / ChartAxisMaxValue) + 1;
+				X = (X % ChartAxisMaxValue) - 1;
 			}
 			if (Y > ChartAxisMaxValue)
 			{
-				Y = (Y / ChartAxisMaxValue) + 1;
+				Y = (Y % ChartAxisMaxValue) - 1;
 			}
 
-			var a = (UInt32)A;
+			var a = (UInt32)A;  // ## HERE
 			var b = (UInt32)B;
 			var x = (UInt32)X;
 			var y = (UInt32)Y;
 
-			Complex aComplex = new Complex((double)A, 0);
-			double mag = aComplex.Magnitude;
-			double phase = aComplex.Phase;
+			//Complex aComplex = new Complex((double)A, 0);
+			//double mag = aComplex.Magnitude;
+			//double phase = aComplex.Phase;
 
-			//if (a == 0 || b == 0 || x == 0 || y == 0)
-			//{
-			//	return;
-			//}
-			//if (a - b == 0 || x - y == 0 || b - a == 0 || y - x == 0)
-			//{
-			//	return;
-			//}
+			if (a == 0 || b == 0 || x == 0 || y == 0 || a < 0 || b < 0 || x < 0 || y < 0
+				|| a > ChartAxisMaxValue || b > ChartAxisMaxValue || x > ChartAxisMaxValue || y > ChartAxisMaxValue)
+			{
+				return;
+			}
+			if (a - b == 0 || x - y == 0 || b - a == 0 || y - x == 0)
+			{
+				return;
+			}
 
 			//var a1 = Math.Sin(1) * a;   // BLUE
 			//var b1 = Math.Sin(1) * b;   // BLUE
@@ -789,11 +799,12 @@ namespace SemiprimeVisualizer
 
 			if (a > 1 && b > 1 && Math.Max(a, b) - Math.Min(a, b) > 1)
 			{
-				chart1.Series[0].Points.AddXY(a, b);
+				chart1.Series[0].Points.AddXY(b, a);
+
 			}
 			if (x > 1 && y > 1 && Math.Max(x, y) - Math.Min(x, y) > 1)
 			{
-				chart1.Series[1].Points.AddXY(x, y);
+				//chart1.Series[1].Points.Add(x);
 			}
 
 
@@ -814,10 +825,10 @@ namespace SemiprimeVisualizer
 			BigInteger.DivRem(currentProgress.SemiPrime, p.CurrentValue, out remainder);
 
 			var x = (UInt32)remainder;
-			var y = counterC;
+			var y = (UInt32)counterC;
 
-			//if (double.IsInfinity(x) || double.IsNaN(x)) { x = 0; }
-			//if (double.IsInfinity(y) || double.IsNaN(y)) { y = 0; }
+			if (double.IsInfinity(x) || double.IsNaN(x)) { x = 0; }
+			if (double.IsInfinity(y) || double.IsNaN(y)) { y = 0; }
 
 			if (x > ChartAxisMaxValue)
 			{
@@ -840,7 +851,7 @@ namespace SemiprimeVisualizer
 
 			if (x > 1 && y > 1 && x - y > 1 && y - x > 1)
 			{
-				chart1.Series[2].Points.AddXY(x, y);
+				chart1.Series[2].Points.Add(x);
 			}
 			counterC += (UInt32)AutomatedLargeStepValue;
 		}

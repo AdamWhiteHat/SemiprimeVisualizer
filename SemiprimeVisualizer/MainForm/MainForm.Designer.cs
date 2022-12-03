@@ -30,6 +30,8 @@
         {
 			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+			System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+			System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
 			this.tbSemiPrime = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
@@ -568,7 +570,16 @@
 			this.chart1.Margin = new System.Windows.Forms.Padding(0);
 			this.chart1.Name = "chart1";
 			this.chart1.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Excel;
+			series1.ChartArea = "ChartArea1";
+			series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastPoint;
+			series1.Name = "Series1";
+			series2.ChartArea = "ChartArea1";
+			series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastPoint;
+			series2.Name = "Series2";
+			this.chart1.Series.Add(series1);
+			this.chart1.Series.Add(series2);
 			this.chart1.Size = new System.Drawing.Size(474, 606);
+			this.chart1.SuppressExceptions = true;
 			this.chart1.TabIndex = 64;
 			this.chart1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseClick);
 			this.chart1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseMove);
@@ -804,6 +815,7 @@
 			this.DoubleBuffered = true;
 			this.Name = "MainForm";
 			this.Text = "Factor Semi-prime";
+			this.Shown += new System.EventHandler(this.MainForm_Shown);
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownP)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericUpDownQ)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.numericTimerDelay)).EndInit();
